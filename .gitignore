@@ -1,0 +1,24 @@
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual envs / local Python tooling
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+
+# Legacy output/debug locations (if created)
+out/
+debug_cases/
+libradtran_s2_lut_rows.json
+
+# Optional large source docs/data in local workflow
+data/generated_6s_50k_13b/
+data/generated_libradtran_50k_13b/
+data/qavalid_intersection_libradtran_6s_50k_13b/

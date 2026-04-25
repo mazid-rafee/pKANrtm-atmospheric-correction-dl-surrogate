@@ -1,0 +1,10 @@
+pandas
+numpy
+scikit-learn
+matplotlib
+joblib
+torch
+efficient-kan
+xgboost
+tabulate
+Py6S

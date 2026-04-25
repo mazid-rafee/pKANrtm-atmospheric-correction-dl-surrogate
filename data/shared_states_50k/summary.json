@@ -1,0 +1,78 @@
+{
+  "unique_states": 50000,
+  "split_counts": {
+    "train": 35000,
+    "val": 7500,
+    "test": 7500
+  },
+  "counts_per_aerosol_type": {
+    "continental": 12500,
+    "maritime": 12500,
+    "urban": 12500,
+    "desert": 12500
+  },
+  "counts_per_atm_profile": {
+    "tropical": 10000,
+    "midlatitude_summer": 10000,
+    "midlatitude_winter": 10000,
+    "subarctic_summer": 10000,
+    "subarctic_winter": 10000
+  },
+  "counts_per_aerosol_atm_combination": {
+    "continental|tropical": 2500,
+    "continental|midlatitude_summer": 2500,
+    "continental|midlatitude_winter": 2500,
+    "continental|subarctic_summer": 2500,
+    "continental|subarctic_winter": 2500,
+    "maritime|tropical": 2500,
+    "maritime|midlatitude_summer": 2500,
+    "maritime|midlatitude_winter": 2500,
+    "maritime|subarctic_summer": 2500,
+    "maritime|subarctic_winter": 2500,
+    "urban|tropical": 2500,
+    "urban|midlatitude_summer": 2500,
+    "urban|midlatitude_winter": 2500,
+    "urban|subarctic_summer": 2500,
+    "urban|subarctic_winter": 2500,
+    "desert|tropical": 2500,
+    "desert|midlatitude_summer": 2500,
+    "desert|midlatitude_winter": 2500,
+    "desert|subarctic_summer": 2500,
+    "desert|subarctic_winter": 2500
+  },
+  "continuous_min_max": {
+    "sza_deg": {
+      "min": 0.0011010816771588356,
+      "max": 69.9973333835249
+    },
+    "vza_deg": {
+      "min": 0.0005408643742680945,
+      "max": 29.999852147863606
+    },
+    "raa_deg": {
+      "min": 0.003655370857442659,
+      "max": 179.99959795173172
+    },
+    "aod550": {
+      "min": 0.020030902489414505,
+      "max": 1.4999709548731224
+    },
+    "cwv_cm": {
+      "min": 0.20003008406605444,
+      "max": 5.999955179773397
+    },
+    "o3_cm": {
+      "min": 0.2000006053600255,
+      "max": 0.4499999552684455
+    },
+    "elev_km": {
+      "min": 0.0001875214187482123,
+      "max": 2.9999071049853723
+    }
+  },
+  "state_id_includes_solver": false,
+  "state_id_includes_nstr": false,
+  "states_manifest": "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/data/shared_states_50k/state_manifest.jsonl",
+  "seed": 42,
+  "n_states_requested": 50000
+}

@@ -1,0 +1,2 @@
+pylrt
+export LIBRADTRAN_DATA_FILES="$HOME/rtm/libradtran_install/data"
