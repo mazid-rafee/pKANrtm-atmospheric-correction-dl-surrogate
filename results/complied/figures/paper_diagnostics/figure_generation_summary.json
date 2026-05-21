@@ -2,7 +2,7 @@
   "input_data_path": null,
   "input_data_6s_path": "data/qavalid_intersection_libradtran_6s_50k_13b/dataset_rows_6s.jsonl",
   "input_data_lrt_path": "data/qavalid_intersection_libradtran_6s_50k_13b/dataset_rows_libradtran.jsonl",
-  "prediction_path": "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/runs/mf_parallel_2gpu_allbands/final_comparison.csv",
+  "prediction_path": null,
   "split_mode": "ood_aod_cwv",
   "detected_coefficient_columns": {
     "rho_path": "rho_path_6s,rho_path_lrt",
@@ -10,14 +10,7 @@
     "spher_alb": "spher_alb_6s,spher_alb_lrt"
   },
   "generated_figures": [
-    "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/figures/paper_diagnostics/figure_01_state_space_coverage.png",
-    "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/figures/paper_diagnostics/figure_02_6s_libradtran_discrepancy.png",
-    "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/figures/paper_diagnostics/figure_03_srtmnet_style_coefficients_residuals.png",
-    "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/figures/paper_diagnostics/figure_04b_conditional_error_heatmap_6s_baseline.png",
-    "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/figures/paper_diagnostics/figure_05_representative_cases.png",
-    "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/figures/paper_diagnostics/figure_06a_residual_correlation_matrix.png",
-    "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/figures/paper_diagnostics/figure_06b_residual_pca_modes.png",
-    "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/figures/paper_diagnostics/figure_07_feature_importance.png"
+    "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/pKANrtm/results/complied/figures/paper_diagnostics/figure_01_state_space_coverage.png"
   ],
   "skipped_figures": {},
   "rows_used": 609722,
@@ -25,9 +18,7 @@
   "available_models_modes": {
     "models": [
       "kan",
-      "mlp",
-      "pkan",
-      "pmlp"
+      "pkan"
     ],
     "split_modes": [
       "ood_aod_cwv",
@@ -35,64 +26,29 @@
     ]
   },
   "selected_models": {
-    "best_kan": {
+    "best_kan": null,
+    "best_mlp": null,
+    "best_overall": null,
+    "best_from_accuracy_md": {
       "fidelity_mode": "oracle_residual",
       "split_mode": "ood_aod_cwv",
-      "model": "kan",
-      "rmse": 0.0107692558941649,
-      "mae": 0.0057031099798422,
-      "r2": 0.9934475062325008,
-      "mape": 2366.385782978954,
-      "smape": 6.319815859239299,
+      "model": "pkan",
+      "rmse": 0.0102233,
+      "mae": "0.00544004",
+      "r2": "0.994183",
+      "mape": "2339.04",
+      "smape": "5.3985",
       "run_subfolder": "oracle_ood_gpu5",
-      "variant_tag": "axis-kan__m-baseline__k-baseline__act-relu__ln-0",
+      "variant_tag": "axis-kan__m-baseline__k-small__act-relu__ln-0",
       "sweep_axis": "kan",
-      "mlp_arch": "baseline",
-      "kan_arch": "baseline",
+      "kan_arch": "small",
       "activation": "relu",
-      "use_layernorm": false,
-      "expected_fidelity_mode": "oracle_residual",
-      "expected_split_mode": "ood_aod_cwv"
-    },
-    "best_mlp": {
-      "fidelity_mode": "oracle_residual",
-      "split_mode": "ood_aod_cwv",
-      "model": "mlp",
-      "rmse": 0.0055577351731597,
-      "mae": 0.0024023714879145,
-      "r2": 0.9969095412105324,
-      "mape": 1627.0841571134124,
-      "smape": 3.3690267918416885,
-      "run_subfolder": "oracle_ood_gpu5",
-      "variant_tag": "axis-mlp__m-wider_gelu__k-baseline__act-relu__ln-0",
-      "sweep_axis": "mlp",
-      "mlp_arch": "wider_gelu",
-      "kan_arch": "baseline",
-      "activation": "relu",
-      "use_layernorm": false,
-      "expected_fidelity_mode": "oracle_residual",
-      "expected_split_mode": "ood_aod_cwv"
-    },
-    "best_overall": {
-      "fidelity_mode": "oracle_residual",
-      "split_mode": "ood_aod_cwv",
-      "model": "mlp",
-      "rmse": 0.0055577351731597,
-      "mae": 0.0024023714879145,
-      "r2": 0.9969095412105324,
-      "mape": 1627.0841571134124,
-      "smape": 3.3690267918416885,
-      "run_subfolder": "oracle_ood_gpu5",
-      "variant_tag": "axis-mlp__m-wider_gelu__k-baseline__act-relu__ln-0",
-      "sweep_axis": "mlp",
-      "mlp_arch": "wider_gelu",
-      "kan_arch": "baseline",
-      "activation": "relu",
-      "use_layernorm": false,
+      "use_layernorm": "False",
       "expected_fidelity_mode": "oracle_residual",
       "expected_split_mode": "ood_aod_cwv"
     }
   },
   "paired_mode": "merged_6s_lrt",
-  "merge_keys": "state_id,band"
+  "merge_keys": "state_id,band",
+  "accuracy_md_path": "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/pKANrtm/results/inference_accuracy_benchmark.md"
 }

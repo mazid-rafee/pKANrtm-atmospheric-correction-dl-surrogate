@@ -1,0 +1,39 @@
+{
+  "data": null,
+  "data_6s": "data/qavalid_intersection_libradtran_6s_50k_13b/dataset_rows_6s.jsonl",
+  "data_lrt": "data/qavalid_intersection_libradtran_6s_50k_13b/dataset_rows_libradtran.jsonl",
+  "output_dir": "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/pKANrtm/runs/fig05_surrogate_pkan",
+  "fidelity_mode": "oracle_residual",
+  "requested_fidelity_mode": "oracle_residual",
+  "resolved_fidelity_modes": [
+    "oracle_residual"
+  ],
+  "exclude_b10": false,
+  "batch_size": 8192,
+  "epochs": 25,
+  "lr": 0.001,
+  "seed": 42,
+  "models": [
+    "pkan"
+  ],
+  "mlp_arch": "baseline",
+  "kan_arch": "small",
+  "activation": "relu",
+  "use_layernorm": false,
+  "deployable_stage_sizing": false,
+  "lambda_phys": 1.0,
+  "num_workers": 4,
+  "gpu": "0",
+  "amp": true,
+  "patience": 8,
+  "split_mode": "ood_aod_cwv",
+  "ood_quantile": 0.85,
+  "benchmark_runtime": false,
+  "runtime_repeats": null,
+  "runtime_batch_size": null,
+  "rtm_row_time_sec": null,
+  "rf_trees": 150,
+  "rf_progress_steps": 25,
+  "xgb_trees": 200,
+  "no_progress": true
+}

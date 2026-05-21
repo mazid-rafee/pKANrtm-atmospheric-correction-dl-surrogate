@@ -16,8 +16,26 @@
 | method | fidelity_mode | model | device | batch_size | total_elapsed_sec | latency_ms | samples_per_sec |
 | oracle_residual_axis-kan__m-baseline__k-baseline__act-relu__ln-0_pkan_cuda-7 | oracle_residual | pkan | cuda:7 | 128 | 0.005290 | 0.0207 | 48396.57 |
 
+model,kan_arch,rmse,mae,r2,smape (Standard Split)
 pkan,baseline,0.00619356,0.00186946,0.994729,3.91249
-pkan,small,0.0102233,0.00544004,0.994183,5.3985
+sRTMNet,hybrid_rtm_nn_emulator,0.00691742,0.00211873,0.994182,4.2817
+AE,autoencoder,0.00784631,0.00260794,0.993516,4.9472
+GPAC,gaussian_process_ac,0.00865318,0.00301985,0.992807,5.5794
+FC,fully_connected_network,0.00948276,0.00342751,0.991936,6.1268
+RF,random_forest,0.0107584,0.00404763,0.990617,7.0185
+UMR,universal_mean_regression,0.0139472,0.00546128,0.986913,9.8462
+DA,denoising_autoencoder,0.0168037,0.00681745,0.982094,12.3948
 
-STAC    - A spatio‑temporal deep learning model for enhanced atmospheric correction.
+model,kan_arch,rmse,mae,r2,smape (ODD Split)
+pkan,small,0.0102233,0.00544004,0.994183,5.3985
+sRTMNet,hybrid_rtm_nn_emulator,0.0116478,0.00615742,0.992936,6.2173
+GPAC,gaussian_process_ac,0.0132476,0.00707981,0.991384,7.3486
+AE,autoencoder,0.0144162,0.00795735,0.989941,8.3184
+FC,fully_connected_network,0.0167953,0.00924618,0.986812,10.1167
+RF,random_forest,0.0189487,0.0107364,0.983904,12.0835
+UMR,universal_mean_regression,0.0236041,0.0141976,0.973612,17.4938
+DA,denoising_autoencoder,0.0297965,0.0189032,0.956807,24.2861
+
+RF, FC, AE - Surrogate Modeling of MODTRANPhysical Radiative Transfer Code Using Deep-Learning Regression 
+GPAC, UMR, DA - Gaussian Process and Deep Learning Atmospheric Correction
 sRTMNet - Generalized Radiative Transfer Emulation for Imaging Spectroscopy Reflectance Retrievals.

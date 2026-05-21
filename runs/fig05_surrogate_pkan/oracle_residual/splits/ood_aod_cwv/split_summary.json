@@ -1,0 +1,25 @@
+{
+  "split_mode": "ood_aod_cwv",
+  "split_source": "ood_aod_cwv_holdout_by_state",
+  "quantile": 0.85,
+  "aod_threshold": 1.2757646299304064,
+  "cwv_threshold": 5.143458123806827,
+  "n_train_states": 30731,
+  "n_val_states": 5422,
+  "n_test_states": 13847,
+  "rows_by_split": {
+    "train": 375791,
+    "val": 66291,
+    "test": 167640
+  },
+  "states_by_split": {
+    "test": 13847,
+    "train": 30731,
+    "val": 5422
+  },
+  "split_leakage": {
+    "train_val_overlap": 0,
+    "train_test_overlap": 0,
+    "val_test_overlap": 0
+  }
+}

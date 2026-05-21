@@ -1,0 +1,3 @@
+model,metric,best_coefficient,best_value,worst_coefficient,worst_value
+pkan,rmse,rho_path,0.0043014513406850535,T_total,0.02125300777406981
+pkan,smape,spher_alb,5.928408683725257,rho_path,8.781711127004552

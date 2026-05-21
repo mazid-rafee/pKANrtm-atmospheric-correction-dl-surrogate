@@ -1,0 +1,3 @@
+model,metric,best_band,best_value,worst_band,worst_value
+pkan,rmse,B11,0.007580695123121692,B10,0.048194489914683065
+pkan,smape,B1,2.3476831265733122,B10,123.41053430503473
