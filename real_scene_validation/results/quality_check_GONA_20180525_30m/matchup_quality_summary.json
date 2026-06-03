@@ -1,0 +1,96 @@
+{
+  "site": "GONA",
+  "site_long_name": "Gobabeb, Namibia",
+  "date": "2018-05-25",
+  "platform": "S2A",
+  "tile": "T33KWP",
+  "sentinel_time_utc": "08:46:01",
+  "roi_center_lat": -23.59999,
+  "roi_center_lon": 15.119215,
+  "roi_radius_m": 30.0,
+  "verdict": "FAIL",
+  "recommendation": "DO NOT USE this matchup.",
+  "pass_criteria": {
+    "no-data/black <= 1%": false,
+    "bad/unknown SCL <= 1%": true,
+    "RadCalNet time <= 30 min": true,
+    "L1C/L2A match": true,
+    "RadCalNet BOA spectrum exists": true
+  },
+  "fail_count": 5,
+  "warn_count": 0,
+  "nodata_affects_roi": true,
+  "l1c_l2a_match": true,
+  "scl_verdict": "PASS",
+  "radcalnet_time_verdict": "PASS",
+  "usable_bands": [
+    "B01",
+    "B02",
+    "B03",
+    "B04",
+    "B05",
+    "B06",
+    "B07",
+    "B08",
+    "B8A",
+    "B09",
+    "B11",
+    "B12"
+  ],
+  "excluded_bands": [
+    "B10"
+  ],
+  "radcalnet": {
+    "AOD550": 0.037,
+    "Angstrom": 1.058,
+    "CWV_g_cm2": 1.33,
+    "Ozone_DU": 319.0,
+    "Pressure_mbar": 958.58,
+    "Temperature_K": 304.4,
+    "SZA_deg": 52.7438,
+    "SAA_deg": 34.8016,
+    "time_diff_min": 13.98,
+    "nearest_utc": "2018-05-25 09:00:00",
+    "nearest_local": "10:00",
+    "supported_vnir_bands": [
+      "B01",
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B09"
+    ],
+    "unsupported_vnir_bands": [],
+    "swir_supported": [
+      "B11",
+      "B12"
+    ],
+    "swir_unsupported": []
+  },
+  "issues": [
+    {
+      "severity": "FAIL",
+      "message": "L1C B01: 100.0% no-data/black pixels in GONA ROI."
+    },
+    {
+      "severity": "FAIL",
+      "message": "L1C B09: 100.0% no-data/black pixels in GONA ROI."
+    },
+    {
+      "severity": "FAIL",
+      "message": "L2A B01: 100.0% no-data/black pixels in GONA ROI."
+    },
+    {
+      "severity": "FAIL",
+      "message": "L2A B09: 100.0% no-data/black pixels in GONA ROI."
+    },
+    {
+      "severity": "FAIL",
+      "message": "Black cut-off / no-data pixels affect the GONA ROI (> 1%)."
+    }
+  ]
+}

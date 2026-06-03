@@ -20,7 +20,9 @@ from typing import Dict, List, Optional, Tuple
 import matplotlib
 
 matplotlib.use("Agg")
+matplotlib.rcParams["axes.unicode_minus"] = True
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -29,6 +31,8 @@ from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+
+MINUS = "\u2212"  # Unicode minus sign (U+2212), not ASCII hyphen-minus
 
 COEFS = ["rho_path", "t_total", "spher_alb"]
 COEF_LABEL = {"rho_path": "rho_path", "t_total": "T_total", "spher_alb": "spher_alb"}
@@ -263,23 +267,62 @@ def _safe_qcut(values: pd.Series, n_bins: int = 6) -> pd.Series:
         return pd.cut(values, bins=min(n_bins, int(v.nunique())), duplicates="drop")
 
 
-def _fmt_float_short(x: float) -> str:
+def _mathtext_number_body(x: float) -> str:
+    """Mathtext body (no surrounding $) with Unicode minus and \\times 10^{n} notation."""
     if not np.isfinite(x):
-        return "nan"
-    ax = abs(float(x))
-    if ax == 0:
+        return r"\mathrm{nan}"
+    if x == 0:
         return "0"
+    sign = MINUS if x < 0 else ""
+    ax = abs(float(x))
     if ax < 1e-3 or ax >= 1e4:
-        return f"{x:.2e}"
-    return f"{x:.4g}"
+        exp = int(np.floor(np.log10(ax)))
+        mantissa = ax / (10.0**exp)
+        if abs(mantissa - round(mantissa)) < 1e-6:
+            m_str = str(int(round(mantissa)))
+        else:
+            m_str = f"{mantissa:.2g}"
+        return rf"{sign}{m_str} \times 10^{{{exp}}}"
+    return sign + f"{ax:.4g}"
+
+
+def _mathtext_number_label(x: float) -> str:
+    return rf"${_mathtext_number_body(x)}$"
 
 
 def _format_bin_label(v) -> str:
     if isinstance(v, pd.Interval):
-        left = _fmt_float_short(float(v.left))
-        right = _fmt_float_short(float(v.right))
-        return f"[{left}, {right}]"
-    return str(v)
+        left = _mathtext_number_body(float(v.left))
+        right = _mathtext_number_body(float(v.right))
+        return rf"$[{left},\, {right}]$"
+    return str(v).replace("-", MINUS)
+
+
+def _colorbar_tick_formatter(x: float, _pos: int) -> str:
+    return _mathtext_number_label(x)
+
+
+def _comma_tick_formatter(x: float, _pos: int) -> str:
+    """Format axis ticks: comma-separate thousands for integers with 5+ digits only."""
+    if not np.isfinite(x):
+        return ""
+    r = round(x)
+    if abs(x - r) < 1e-6:
+        ival = int(r)
+        if abs(ival) >= 10000:
+            return f"{ival:,}"
+        if abs(ival) >= 1:
+            return str(ival)
+        if ival == 0:
+            return "0"
+    s = f"{x:.4g}"
+    return s.replace("-", MINUS)
+
+
+def _apply_comma_axis_ticks(ax: plt.Axes) -> None:
+    fmt = FuncFormatter(_comma_tick_formatter)
+    ax.xaxis.set_major_formatter(fmt)
+    ax.yaxis.set_major_formatter(fmt)
 
 
 def _parse_md_tables(md_path: Path) -> List[pd.DataFrame]:
@@ -579,6 +622,8 @@ def fig_01_state_space_coverage(df: pd.DataFrame, out_dir: Path) -> List[str]:
         ax.set_title("band")
         ax.tick_params(axis="x", rotation=45)
         ax.grid(alpha=0.25)
+    for ax in axes:
+        _apply_comma_axis_ticks(ax)
     return savefig(fig, out_dir, "figure_01_state_space_coverage")
 
 
@@ -696,7 +741,9 @@ def _heatmap_panel(df_err: pd.DataFrame, coeff: str, cond: str, ax: plt.Axes) ->
     ax.set_yticks(np.arange(len(piv.index)))
     ax.set_yticklabels([_format_bin_label(v) for v in piv.index])
     ax.set_title(f"{coeff} | {cond}")
-    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    cbar.ax.yaxis.set_major_formatter(FuncFormatter(_colorbar_tick_formatter))
+    cbar.ax.yaxis.get_offset_text().set_visible(False)
 
 
 def fig_04_heatmaps(

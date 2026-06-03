@@ -1,45 +1,72 @@
-# Atmospheric Correction Surrogate Pipeline
+# pKANrtm
 
-This repository contains a full workflow for atmospheric correction surrogate modeling:
+**Physics-guided multi-fidelity surrogate for atmospheric correction coefficients**
 
-- state-manifest generation
-- libRadtran dataset generation
-- 6S dataset generation
-- dataset sanity checks
-- surrogate training/evaluation (single- and multi-fidelity)
-- runtime benchmarking (`benchmark_runtime.py`)
-- multi-GPU architecture sweeps (`run_parallel_4gpu.sh`)
+Official code release for:
 
-Primary target variables are:
-
-- `rho_path`
-- `T_total`
-- `spher_alb`
+> **Multi-Fidelity Emulation of Atmospheric Correction Coefficients with Physics-Guided Kolmogorov–Arnold Networks**  
+> Md Abdullah Al Mazid, Naphtali Rishe  
+> *Remote Sensing* **2026**, *18*(11), 1826  
+> [https://doi.org/10.3390/rs18111826](https://doi.org/10.3390/rs18111826) · [https://www.mdpi.com/2072-4292/18/11/1826](https://www.mdpi.com/2072-4292/18/11/1826)
 
 ---
 
-## Current Project Entry Points
+## Overview
 
-- `data_generator/generate_shared_states.py`  
-  Build a normalized shared state manifest (`state_manifest.jsonl`).
-- `data_generator/generate_libradtran_dataset.py`  
-  Generate libRadtran rows from a shared manifest.
-- `data_generator/generate_6s_dataset.py`  
-  Generate 6S rows from the same shared manifest.
-- `check_dataset.py`  
-  Validate dataset structure/distribution/readiness.
-- `train_surrogates.py`  
-  Train/evaluate models and generate reports/metrics.
-- `benchmark_runtime.py`  
-  Benchmark RTM + surrogate runtime (tables + markdown + machine info).
-- `run_parallel_4gpu.sh`  
-  Architecture sweep launcher with final parent-level aggregation.
+This repository implements **pKANrtm**, a physics-guided Kolmogorov–Arnold Network (KAN) that emulates libRadtran atmospheric correction coefficients from paired **6S → libRadtran** multi-fidelity simulations. Atmospheric and geometric states are sampled with Latin Hypercube Sampling; targets are **path reflectance** (`rho_path`), **total transmittance** (`T_total`), and **spherical albedo** (`spher_alb`) for Sentinel-2 bands (SRF-aware).
+
+The pipeline covers:
+
+- shared state-manifest generation and paired RTM dataset builds (6S + libRadtran)
+- dataset validation, surrogate training/evaluation (oracle-residual KAN / pKAN)
+- runtime benchmarking and multi-GPU architecture sweeps
+- paper diagnostic figures and GONA RadCalNet real-scene validation
 
 ---
 
-## Environment Setup
+## Citation
 
-Use your existing environment (example: `pylrt`):
+If you use this code or the associated datasets, please cite:
+
+```bibtex
+@Article{mazid2026pkanrtm,
+  author  = {Mazid, Md Abdullah Al and Rishe, Naphtali},
+  title   = {Multi-Fidelity Emulation of Atmospheric Correction Coefficients with Physics-Guided Kolmogorov--Arnold Networks},
+  journal = {Remote Sensing},
+  volume  = {18},
+  number  = {11},
+  pages   = {1826},
+  year    = {2026},
+  doi     = {10.3390/rs18111826}
+}
+```
+
+Plain text: Mazid, M.A.A.; Rishe, N. Multi-Fidelity Emulation of Atmospheric Correction Coefficients with Physics-Guided Kolmogorov–Arnold Networks. *Remote Sens.* **2026**, *18*, 1826. https://doi.org/10.3390/rs18111826
+
+---
+
+## Repository layout
+
+| Path | Role |
+|------|------|
+| `data_generator/` | Shared states, libRadtran and 6S dataset generation |
+| `surrogate_pipeline/` | Model definitions, data loading, training utilities |
+| `train_surrogates.py` | Main training and evaluation entry point |
+| `tools/` | `check_dataset.py`, `benchmark_runtime.py`, plotting helpers |
+| `scripts/` | Paper diagnostic figure generation |
+| `analysis/` | Supplementary analysis (e.g. KAN complexity table) |
+| `real_scene_validation/` | GONA Sentinel-2 + RadCalNet matchup validation |
+| `data/` | Generated datasets (not all shipped in git; see workflow below) |
+| `runs/` | Training outputs, checkpoints, metrics |
+| `results/` | Compiled tables and paper artifacts |
+| `benchmarks/` | Runtime benchmark helpers |
+| `run_parallel_4gpu.sh` | Multi-GPU architecture sweep launcher |
+
+---
+
+## Environment setup
+
+Use a Python environment with PyTorch and RTM dependencies (example: `pylrt`):
 
 ```bash
 conda activate pylrt
@@ -47,13 +74,18 @@ python -m pip install -r requirements.txt
 python -m pip install "git+https://github.com/Blealtan/efficient-kan.git"
 ```
 
-For 6S generation, ensure the 6S executable is available on `PATH` for Py6S.
+**External RTMs (not installed by pip):**
+
+- **6S** — on `PATH` for Py6S dataset generation
+- **libRadtran** — `uvspec` for high-fidelity dataset generation
+
+Sentinel-2 spectral response functions live under `data/sentinel_srf/` (see `tools/extract_s2_srf.py` if you need to rebuild them).
 
 ---
 
-## End-to-End Workflow
+## End-to-end workflow
 
-## 1) Generate shared states
+### 1) Generate shared states
 
 ```bash
 python data_generator/generate_shared_states.py \
@@ -62,12 +94,9 @@ python data_generator/generate_shared_states.py \
   --seed 42
 ```
 
-Produces:
+Produces: `state_manifest.jsonl`, `summary.json`
 
-- `state_manifest.jsonl`
-- `summary.json`
-
-## 2) Generate libRadtran dataset from the shared manifest
+### 2) Generate libRadtran dataset
 
 ```bash
 python data_generator/generate_libradtran_dataset.py \
@@ -80,13 +109,9 @@ python data_generator/generate_libradtran_dataset.py \
   --copy_manifest
 ```
 
-Produces:
+Produces: `dataset_rows.jsonl`, `summary.json`
 
-- `dataset_rows.jsonl`
-- `summary.json`
-- optional `state_manifest.jsonl` copy
-
-## 3) Generate 6S dataset from the same manifest
+### 3) Generate 6S dataset (same manifest)
 
 ```bash
 python data_generator/generate_6s_dataset.py \
@@ -100,46 +125,31 @@ python data_generator/generate_6s_dataset.py \
   --copy_manifest
 ```
 
-Produces:
+Produces: `dataset_rows.jsonl`, `summary.json`, `errors.jsonl`
 
-- `dataset_rows.jsonl`
-- `summary.json`
-- `errors.jsonl`
-
-## 4) Sanity-check dataset
+### 4) Sanity-check a dataset
 
 ```bash
-python check_dataset.py \
+python tools/check_dataset.py \
   --data "data/generated_libradtran_50k_13b/dataset_rows.jsonl" \
   --output_dir "runs/dataset_check_lrt_50k"
 ```
 
-Produces:
-
-- `dataset_check_summary.json`
-- `dataset_check_report.txt`
-- CSV summaries (row counts, split stats, numeric stats, etc.)
+Produces: `dataset_check_summary.json`, `dataset_check_report.txt`, CSV summaries
 
 ---
 
-## Training and Evaluation (`train_surrogates.py`)
+## Training and evaluation
 
-Supported fidelity mode (project focus):
+**Entry point:** `train_surrogates.py`
 
-- `oracle_residual`
+| Setting | Options (paper focus) |
+|---------|------------------------|
+| Fidelity | `oracle_residual` |
+| Models | `kan`, `pkan` |
+| Splits | `standard`, `ood_aod_cwv`, `both` |
 
-Supported models (project focus):
-
-- `kan`
-- `pkan`
-
-Supported split modes:
-
-- `standard`
-- `ood_aod_cwv`
-- `both`
-
-### Example: oracle residual (KAN/PKAN only)
+### Example: oracle-residual KAN / pKAN
 
 ```bash
 python train_surrogates.py \
@@ -156,77 +166,23 @@ python train_surrogates.py \
   --exclude_b10
 ```
 
-### Important note on in-training runtime timing
+**Note:** In-training runtime timing is disabled inside `train_surrogates.py`. Use `tools/benchmark_runtime.py` for timing studies.
 
-`train_surrogates.py` currently force-disables in-training runtime benchmarking (even if runtime flags are passed).  
-Use `benchmark_runtime.py` for runtime/timing analysis.
+### Metrics and outputs
 
----
+Per split: RMSE, MAE, R², MAPE, sMAPE (with `eps = 1e-6` for ratio metrics). Reports include band-wise, coefficient-wise, and full band×coefficient tables.
 
-## Metrics and Reporting (current)
+Under `<output_dir>/<fidelity_mode>/`:
 
-For each split, overall and per-dimension metrics include:
-
-- RMSE
-- MAE
-- R2
-- MAPE (epsilon-safe denominator)
-- sMAPE (epsilon-safe denominator)
-
-The report documents epsilon (`eps = 1e-6`) and includes the near-zero-target caution.
-
-### Detailed breakdowns generated
-
-- band-wise aggregated metrics across coefficients
-- coefficient-wise aggregated metrics across bands
-- full band x coefficient matrix
-- best/worst band/coefficient by RMSE and sMAPE
-
-### Key training outputs
-
-At fidelity root (`<output_dir>/<fidelity_mode>/`):
-
-- `combined_metrics.csv`
-- `accuracy_table.csv`
-- `band_metrics_table.csv`
-- `coefficient_metrics_table.csv`
-- `band_coefficient_metrics_table.csv`
-- `best_worst_band_metrics.csv`
-- `best_worst_coefficient_metrics.csv`
+- `combined_metrics.csv`, `accuracy_table.csv`, band/coefficient tables
 - `model_comparison.md`
-- `runtime_table.csv` (when available)
 - `splits/standard/` and/or `splits/ood_aod_cwv/`
 
-At per-model split directory (`.../splits/<split_mode>/models/<model>/`):
-
-- `metrics.json`
-- `test_predictions.csv`
-- `per_band_metrics.csv`
-- `per_coefficient_metrics.csv`
-- `per_band_coefficient_metrics.csv`
-- neural: checkpoints/history/loss plots
-- tree: serialized model artifacts
+Per model (`.../splits/<split>/models/<model>/`): `metrics.json`, `test_predictions.csv`, checkpoints, `history.csv`
 
 ---
 
-## Multi-GPU Architecture Sweep (`run_parallel_4gpu.sh`)
-
-Launches architecture sweeps over fixed bundles:
-
-- oracle + standard
-- oracle + OOD
-
-Default fixed GPUs are currently:
-
-- `3`, `5`, `6`, `7`
-
-Important defaults in script:
-
-- includes `--exclude_b10`
-- `JOBS_PER_GPU` controls queue depth per GPU
-- base models are `kan pkan`
-
-### Example
+## Multi-GPU architecture sweep
 
 ```bash
 JOBS_PER_GPU=2 \
@@ -235,32 +191,14 @@ EXTRA_ARGS="--epochs 100 --batch_size 2048 --amp" \
 bash run_parallel_4gpu.sh
 ```
 
-### Parent-level aggregated outputs (current)
-
-- `final_comparison.csv` / `.md`
-- `final_runtime_comparison.csv` / `.md`
-- `final_band_metrics_comparison.csv` / `.md`
-- `final_coefficient_metrics_comparison.csv` / `.md`
-- `final_band_coefficient_metrics_comparison.csv` / `.md`
-- `final_all_comparison.md`
+Defaults: models `kan pkan`, `--exclude_b10`, GPUs `3 5 6 7` (override in script). Parent run aggregates `final_comparison.md`, `final_runtime_comparison.md`, and related CSVs.
 
 ---
 
-## Runtime Benchmarking (`benchmark_runtime.py`)
-
-This is the current benchmark entry point (replaces older naming).
-
-It benchmarks:
-
-- libRadtran CPU baseline
-- 6S runtime
-- surrogate pipelines discovered from mode/run mappings
-- optional SRF sensitivity analysis
-
-### Example
+## Runtime benchmarking
 
 ```bash
-python benchmark_runtime.py \
+python tools/benchmark_runtime.py \
   --data "data/generated_libradtran_50k_13b/dataset_rows.jsonl" \
   --mode_run_root oracle_residual="runs/mf_parallel_4gpu_oracle_kan_pkan" \
   --models kan pkan \
@@ -272,23 +210,55 @@ python benchmark_runtime.py \
   --output_dir "benchmarks/runtime_latest"
 ```
 
-Produces:
-
-- `benchmark_results.csv`
-- `benchmark_results_all.csv`
-- `benchmark_results_batch1.csv`
-- `benchmark_results_throughput.csv`
-- `benchmark_results.md`
-- `machine_info.json`
-- `machine_info.md`
-- `raw_timings.json`
-- `sampled_inputs.csv`
+Outputs: `benchmark_results.md`, `benchmark_results.csv`, `machine_info.json`, `raw_timings.json`
 
 ---
 
-## Notes
+## Real-scene validation (GONA / RadCalNet)
 
-- Splits are state-aware to avoid leakage.
-- `qa_valid` is used when present.
-- `pkan` applies physics-regularized loss (`--lambda_phys`).
-- `--exclude_b10` removes `band == B10` before split/train/eval.
+Scripts under `real_scene_validation/` validate the trained surrogate against **Sen2Cor L2A**, **L1C TOA**, and **RadCalNet** in situ reflectance at the GONA site (Sentinel-2A, 2018-05-25).
+
+| Script | Purpose |
+|--------|---------|
+| `check_matchup_quality.py` | ROI, cloud/SCL, and RadCalNet matchup diagnostics |
+| `run_gona_real_scene_validation.py` | Full band-wise validation vs RadCalNet |
+| `plot_spectral_validation.py` | Spectral validation figure (PDF/PNG) |
+
+Place scene data under `real_scene_validation/data/GONA 25th May 2018/` (L1C/L2A SAFE subsets + `GONA01_2018_145_v04.09.nc`). Point `--checkpoint` to a trained pKAN weights file (e.g. `runs/fig05_surrogate_pkan/.../pkan/best.pt`).
+
+```bash
+python real_scene_validation/check_matchup_quality.py --help
+python real_scene_validation/run_gona_real_scene_validation.py --help
+```
+
+---
+
+## Paper figures and supplementary analysis
+
+```bash
+python scripts/make_paper_diagnostic_figures.py
+```
+
+Figures are written under `results/complied/figures/paper_diagnostics/`.
+
+```bash
+python analysis/reviewer_kan_complexity_table.py
+```
+
+Writes KAN vs FC comparison tables under `results/reviewer_kan_complexity/`.
+
+---
+
+## Implementation notes
+
+- Splits are **state-aware** to prevent leakage across train/val/test.
+- Rows with `qa_valid == false` are excluded when the flag is present.
+- **`pkan`** adds a physics-consistency penalty (`--lambda_phys`) in coefficient space.
+- **`--exclude_b10`** drops `band == B10` before split/train/eval (circus band; common in paper experiments).
+- Low-fidelity inputs are 6S coefficients; the model predicts the **residual to libRadtran** and reconstructs high-fidelity targets.
+
+---
+
+## License and contact
+
+Software is provided to reproduce the methods and results described in the *Remote Sensing* article above. For questions about the publication, use the corresponding author contact listed on the [journal page](https://www.mdpi.com/2072-4292/18/11/1826).

@@ -1,7 +1,7 @@
 {
   "input_data_path": null,
-  "input_data_6s_path": "data/qavalid_intersection_libradtran_6s_50k_13b/dataset_rows_6s.jsonl",
-  "input_data_lrt_path": "data/qavalid_intersection_libradtran_6s_50k_13b/dataset_rows_libradtran.jsonl",
+  "input_data_6s_path": "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/pKANrtm/data/qavalid_intersection_libradtran_6s_50k_13b/dataset_rows_6s.jsonl",
+  "input_data_lrt_path": "/a/bear.cs.fiu.edu./disk/bear-b/users/mmazi007/Desktop/Source Code (Research)/Atmospheric Correction/pKANrtm/data/qavalid_intersection_libradtran_6s_50k_13b/dataset_rows_libradtran.jsonl",
   "prediction_path": null,
   "split_mode": "ood_aod_cwv",
   "detected_coefficient_columns": {
