@@ -261,4 +261,6 @@ Writes KAN vs FC comparison tables under `results/reviewer_kan_complexity/`.
 
 ## License and contact
 
-Software is provided to reproduce the methods and results described in the *Remote Sensing* article above. For questions about the publication, use the corresponding author contact listed on the [journal page](https://www.mdpi.com/2072-4292/18/11/1826).
+Software is provided to reproduce the methods and results described in the *Remote Sensing* article above.
+
+For code, data, or reproduction questions: **mazid.rafee@gmail.com**
